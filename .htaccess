@@ -1,0 +1,13 @@
+Options -Indexes
+
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteRule ^\.well-known/ - [L]
+  RewriteRule ^wolf(/|$) - [L]
+  RewriteRule ^uplay(/|$) - [L]
+  RewriteRule ^dunhill(/|$) - [L]
+  RewriteRule ^cgi-bin(/|$) - [L]
+</IfModule>

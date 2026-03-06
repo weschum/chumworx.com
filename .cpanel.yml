@@ -1,0 +1,13 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/chumuvep/public_html
+    - /usr/bin/rsync -av --delete \
+      --exclude='.git/' \
+      --exclude='.cpanel.yml' \
+      --exclude='wolf/' \
+      --exclude='uplay/' \
+      --exclude='dunhill/' \
+      --exclude='cgi-bin/' \
+      --exclude='.well-known/' \
+      ./ $DEPLOYPATH/
