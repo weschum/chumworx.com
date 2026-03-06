@@ -30,6 +30,10 @@ body {
   letter-spacing: 0.08em;
 }
 
+.logo {
+  fill: white;
+}
+
 .hero {
   min-height: calc(100vh - 228px);
   display: flex;
