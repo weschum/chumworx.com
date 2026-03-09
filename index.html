@@ -9,39 +9,40 @@
 </head>
 <body>
   <header class="site-header">
-    <button
-      class="logo-trigger"
-      id="menuToggle"
-      type="button"
-      aria-expanded="false"
-      aria-controls="siteMenu"
-      aria-label="Open site menu"
-    >
-      <svg class="logo" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 592.33 174.02" aria-hidden="true">
-        <path d="m0,64.82C0,43.82,15.4,28.42,37.24,28.42c19.18,0,33.18,11.9,36.12,28.98h-21.28c-2.38-5.74-7.84-9.38-14.84-9.38-9.52,0-15.96,6.86-15.96,16.8s6.44,16.8,15.96,16.8c7,0,12.46-3.64,14.84-9.38h21.28c-2.94,17.08-16.94,28.98-36.12,28.98C15.4,101.22,0,85.82,0,64.82Z"/>
-        <path d="m86.24,0h21v37.66c4.2-6.02,10.08-9.24,17.22-9.24,14.56,0,30.1,9.8,30.1,35.14v35.84h-21v-35.84c0-10.92-5.32-15.54-13.16-15.54s-13.16,4.9-13.16,15.54v35.84h-21V0Z"/>
-        <path d="m168.28,66.08V30.24h21v35.84c0,10.92,5.32,15.54,13.16,15.54s13.16-4.62,13.16-15.54V30.24h21v35.84c0,23.24-13.72,35.14-34.16,35.14s-34.16-11.76-34.16-35.14Z"/>
-        <path d="m250.32,60.48c0-22.26,12.88-32.06,29.68-32.06,9.8,0,18.06,3.78,23.24,11.06,5.18-7.28,13.3-11.06,23.24-11.06,16.8,0,29.68,9.8,29.68,32.06v38.92h-21v-38.92c0-9.24-4.48-12.46-10.78-12.46s-10.64,3.22-10.64,12.46v38.92h-21v-38.92c0-9.24-4.48-12.46-10.64-12.46s-10.78,3.22-10.78,12.46v38.92h-21v-38.92Z"/>
-        <path d="m250.32,141.96v-38.92h21v38.92c0,9.24,4.48,12.46,10.78,12.46s10.64-3.22,10.64-12.46v-38.92h21v38.92c0,9.24,4.48,12.46,10.64,12.46s10.78-3.22,10.78-12.46v-38.92h21v38.92c0,22.26-12.88,32.06-29.68,32.06-9.94,0-18.06-3.78-23.24-11.06-5.18,7.28-13.44,11.06-23.24,11.06-16.8,0-29.68-9.8-29.68-32.06Z"/>
-        <path d="m367.07,137.62c0-21,15.4-36.4,37.24-36.4s37.24,15.4,37.24,36.4-15.4,36.4-37.24,36.4-37.24-15.4-37.24-36.4Zm53.2,0c0-9.94-6.44-16.8-15.96-16.8s-15.96,6.86-15.96,16.8,6.44,16.8,15.96,16.8,15.96-6.86,15.96-16.8Z"/>
-        <path d="m452.47,132.86c0-21.56,12.6-31.64,31.08-31.64s30.94,9.94,31.08,31.78v.42h-21v-.56c0-9.24-4.2-12.04-10.08-12.04s-10.08,2.8-10.08,12.04v39.34h-21v-39.34Z"/>
-        <path d="m538.57,136.78l-22.4-33.74h25.06l12.74,21.98,12.74-21.98h24.5l-22.54,33.74,23.66,35.42h-25.06l-13.86-23.8-13.86,23.8h-24.5l23.52-35.42Z"/>
-      </svg>
-      <span class="visually-hidden">Open menu</span>
-    </button>
+    <div class="header-stage" id="headerStage">
+      <button
+        class="logo-trigger"
+        id="menuToggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="siteMenu"
+        aria-label="Open site menu"
+      >
+        <svg class="logo" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 592.33 174.02" aria-hidden="true">
+          <path d="m0,64.82C0,43.82,15.4,28.42,37.24,28.42c19.18,0,33.18,11.9,36.12,28.98h-21.28c-2.38-5.74-7.84-9.38-14.84-9.38-9.52,0-15.96,6.86-15.96,16.8s6.44,16.8,15.96,16.8c7,0,12.46-3.64,14.84-9.38h21.28c-2.94,17.08-16.94,28.98-36.12,28.98C15.4,101.22,0,85.82,0,64.82Z"/>
+          <path d="m86.24,0h21v37.66c4.2-6.02,10.08-9.24,17.22-9.24,14.56,0,30.1,9.8,30.1,35.14v35.84h-21v-35.84c0-10.92-5.32-15.54-13.16-15.54s-13.16,4.9-13.16,15.54v35.84h-21V0Z"/>
+          <path d="m168.28,66.08V30.24h21v35.84c0,10.92,5.32,15.54,13.16,15.54s13.16-4.62,13.16-15.54V30.24h21v35.84c0,23.24-13.72,35.14-34.16,35.14s-34.16-11.76-34.16-35.14Z"/>
+          <path d="m250.32,60.48c0-22.26,12.88-32.06,29.68-32.06,9.8,0,18.06,3.78,23.24,11.06,5.18-7.28,13.3-11.06,23.24-11.06,16.8,0,29.68,9.8,29.68,32.06v38.92h-21v-38.92c0-9.24-4.48-12.46-10.78-12.46s-10.64,3.22-10.64,12.46v38.92h-21v-38.92c0-9.24-4.48-12.46-10.64-12.46s-10.78,3.22-10.78,12.46v38.92h-21v-38.92Z"/>
+          <path d="m250.32,141.96v-38.92h21v38.92c0,9.24,4.48,12.46,10.78,12.46s10.64-3.22,10.64-12.46v-38.92h21v38.92c0,9.24,4.48,12.46,10.64,12.46s10.78-3.22,10.78-12.46v-38.92h21v38.92c0,22.26-12.88,32.06-29.68,32.06-9.94,0-18.06-3.78-23.24-11.06-5.18,7.28-13.44,11.06-23.24,11.06-16.8,0-29.68-9.8-29.68-32.06Z"/>
+          <path d="m367.07,137.62c0-21,15.4-36.4,37.24-36.4s37.24,15.4,37.24,36.4-15.4,36.4-37.24,36.4-37.24-15.4-37.24-36.4Zm53.2,0c0-9.94-6.44-16.8-15.96-16.8s-15.96,6.86-15.96,16.8,6.44,16.8,15.96,16.8,15.96-6.86,15.96-16.8Z"/>
+          <path d="m452.47,132.86c0-21.56,12.6-31.64,31.08-31.64s30.94,9.94,31.08,31.78v.42h-21v-.56c0-9.24-4.2-12.04-10.08-12.04s-10.08,2.8-10.08,12.04v39.34h-21v-39.34Z"/>
+          <path d="m538.57,136.78l-22.4-33.74h25.06l12.74,21.98,12.74-21.98h24.5l-22.54,33.74,23.66,35.42h-25.06l-13.86-23.8-13.86,23.8h-24.5l23.52-35.42Z"/>
+        </svg>
+        <span class="visually-hidden">Open menu</span>
+      </button>
 
-    <nav class="menu-panel" id="siteMenu" hidden aria-label="Site menu">
-      <div class="menu-list">
-        <button class="menu-link" type="button" data-modal-open="aboutModal">About</button>
-        <button class="menu-link" type="button" data-modal-open="contactModal">Contact</button>
-      </div>
-    </nav>
+      <nav class="menu-panel" id="siteMenu" hidden aria-label="Site menu">
+        <div class="menu-list">
+          <button class="menu-link" type="button" data-modal-open="aboutModal">About</button>
+          <button class="menu-link" type="button" data-modal-open="contactModal">Contact</button>
+        </div>
+      </nav>
+    </div>
   </header>
 
   <main class="hero">
     <div class="hero-inner">
-      <h1>chumworx</h1>
-      <p>Building tools, apps, and experiments.</p>
+      <h2>tools, apps, and experiments.</h2>
 
       <div class="links">
         <a href="/wolf/">Wolf Disc Golf Scoring App</a>
@@ -103,7 +104,6 @@
           <textarea id="message" name="message" required></textarea>
         </div>
 
-        <!-- Honeypot field: should remain empty -->
         <div class="visually-hidden" aria-hidden="true">
           <label for="company">Company</label>
           <input id="company" name="company" type="text" tabindex="-1" autocomplete="off">
@@ -119,122 +119,131 @@
 
   <script>
     (function () {
-        const menuToggle = document.getElementById('menuToggle');
-        const siteMenu = document.getElementById('siteMenu');
-        const modalOpenButtons = document.querySelectorAll('[data-modal-open]');
-        const modalCloseButtons = document.querySelectorAll('[data-modal-close]');
-        const modals = document.querySelectorAll('.modal');
-        const formStatus = document.getElementById('formStatus');
+      const headerStage = document.getElementById('headerStage');
+      const menuToggle = document.getElementById('menuToggle');
+      const siteMenu = document.getElementById('siteMenu');
+      const modalOpenButtons = document.querySelectorAll('[data-modal-open]');
+      const modalCloseButtons = document.querySelectorAll('[data-modal-close]');
+      const modals = document.querySelectorAll('.modal');
+      const formStatus = document.getElementById('formStatus');
 
-        function closeMenu() {
+      function closeMenu() {
         siteMenu.hidden = true;
+        menuToggle.hidden = false;
         menuToggle.setAttribute('aria-expanded', 'false');
-        }
+        headerStage.classList.remove('menu-open');
+      }
 
-        function openMenu() {
+      function openMenu() {
         siteMenu.hidden = false;
+        menuToggle.hidden = false;
         menuToggle.setAttribute('aria-expanded', 'true');
-        }
+        headerStage.classList.add('menu-open');
+      }
 
-        menuToggle.addEventListener('click', function () {
+      menuToggle.addEventListener('click', function () {
         const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
-        if (expanded) {
-            closeMenu();
-        } else {
-            openMenu();
-        }
-        });
 
-        function openModal(modalId) {
+        if (expanded) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      function openModal(modalId) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
+
         modal.hidden = false;
         document.body.style.overflow = 'hidden';
         closeMenu();
-        }
+      }
 
-        function closeModal(modal) {
+      function closeModal(modal) {
         modal.hidden = true;
         document.body.style.overflow = '';
-        }
+      }
 
-        modalOpenButtons.forEach(function (button) {
+      modalOpenButtons.forEach(function (button) {
         button.addEventListener('click', function () {
-            openModal(button.getAttribute('data-modal-open'));
+          openModal(button.getAttribute('data-modal-open'));
         });
-        });
+      });
 
-        modalCloseButtons.forEach(function (button) {
+      modalCloseButtons.forEach(function (button) {
         button.addEventListener('click', function () {
-            const modal = button.closest('.modal');
-            if (modal) {
+          const modal = button.closest('.modal');
+
+          if (modal) {
             closeModal(modal);
-            } else {
+          } else {
             modals.forEach(closeModal);
-            }
+          }
         });
-        });
+      });
 
-        modals.forEach(function (modal) {
+      modals.forEach(function (modal) {
         modal.addEventListener('click', function (event) {
-            if (event.target === modal) {
+          if (event.target === modal) {
             closeModal(modal);
-            }
+          }
         });
-        });
+      });
 
-        document.addEventListener('keydown', function (event) {
+      document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
-            modals.forEach(function (modal) {
+          modals.forEach(function (modal) {
             if (!modal.hidden) {
-                closeModal(modal);
+              closeModal(modal);
             }
-            });
-            closeMenu();
-        }
-        });
+          });
 
-        document.addEventListener('click', function (event) {
+          closeMenu();
+        }
+      });
+
+      document.addEventListener('click', function (event) {
         const clickedInsideMenu = siteMenu.contains(event.target);
         const clickedToggle = menuToggle.contains(event.target);
 
         if (!siteMenu.hidden && !clickedInsideMenu && !clickedToggle) {
-            closeMenu();
+          closeMenu();
         }
-        });
+      });
 
-        const params = new URLSearchParams(window.location.search);
-        const contactStatus = params.get('contact');
+      const params = new URLSearchParams(window.location.search);
+      const contactStatus = params.get('contact');
 
-        if (contactStatus && formStatus) {
+      if (contactStatus && formStatus) {
         let message = '';
         let className = 'is-error';
 
         if (contactStatus === 'success') {
-            message = 'Your message was sent successfully.';
-            className = 'is-success';
+          message = 'Your message was sent successfully.';
+          className = 'is-success';
         } else if (contactStatus === 'missing') {
-            message = 'Please fill out all fields.';
+          message = 'Please fill out all fields.';
         } else if (contactStatus === 'invalid-email') {
-            message = 'Please enter a valid email address.';
+          message = 'Please enter a valid email address.';
         } else if (contactStatus === 'invalid-name') {
-            message = 'Please enter a valid name.';
+          message = 'Please enter a valid name.';
         } else if (contactStatus === 'message-too-long') {
-            message = 'Your message is too long.';
+          message = 'Your message is too long.';
         } else if (contactStatus === 'send-failed') {
-            message = 'Sorry, the message could not be sent right now.';
+          message = 'Sorry, the message could not be sent right now.';
         }
 
         if (message !== '') {
-            formStatus.textContent = message;
-            formStatus.className = 'form-status ' + className;
-            formStatus.hidden = false;
-            openModal('contactModal');
+          formStatus.textContent = message;
+          formStatus.className = 'form-status ' + className;
+          formStatus.hidden = false;
+          openModal('contactModal');
         }
 
         const cleanUrl = window.location.pathname + window.location.hash;
         window.history.replaceState({}, document.title, cleanUrl);
-        }
+      }
     })();
   </script>
 </body>
