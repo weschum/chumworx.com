@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Baker Bay">
+<meta name="theme-color" content="#2e5e45">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>Baker Bay DGC – Round 2 Cards</title>
+<style>
+:root{--ink:#16201b;--muted:#68736d;--line:#d8dfdb;--bg:#f5f7f6;--card:#fff;--accent:#2e5e45;--accent2:#e7f0ea;--warn:#a5520f;--warnbg:#fff4e5;--bad:#b42318}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:5;background:var(--accent);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 14px 0}
+header h1{font-size:17px;margin:0 0 8px;font-weight:700}
+header h1 span{font-weight:400;opacity:.8}
+nav{display:flex;gap:2px;overflow-x:auto}
+nav button{flex:1;min-width:max-content;background:transparent;border:0;color:#fff;opacity:.75;padding:10px 12px;font:600 14px inherit;font-family:inherit;border-bottom:3px solid transparent;cursor:pointer}
+nav button.on{opacity:1;border-bottom-color:#fff}
+main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-inset-bottom))}
+.panel{display:none}.panel.on{display:block}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.bar input[type=search]{flex:1;min-width:160px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+.btn{appearance:none;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font:600 14px/1 inherit;font-family:inherit;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--accent)}
+.btn.danger{background:#fff;color:var(--bad);border-color:var(--bad)}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--accent2);color:var(--accent)}
+.progress{font-size:13px;color:var(--muted)}
+.grp{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.grp h3{margin:0;padding:9px 12px;font-size:14px;background:#eef2ef;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.grp h3 small{font-weight:500;color:var(--muted)}
+.row{display:grid;grid-template-columns:22px 1fr 54px 74px 74px;gap:8px;align-items:center;padding:7px 12px;border-top:1px solid var(--line)}
+.row.hdr{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;padding:6px 12px}
+.row .n{color:var(--muted);font-size:12px}
+.row .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .dv{font-size:12px;font-weight:700;color:var(--muted)}
+.row input{width:100%;padding:9px 6px;border:1px solid var(--line);border-radius:8px;font:600 17px inherit;font-family:inherit;text-align:center;background:#fff}
+.row input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
+.row input.filled{background:var(--accent2);border-color:#b9d1c1}
+.r2row{display:grid;grid-template-columns:22px 1fr 54px 48px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
+.r2row .sc{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.tie{font-size:10px;font-weight:800;color:var(--warn);background:var(--warnbg);border-radius:4px;padding:1px 4px;margin-left:6px;vertical-align:1px}
+.fixed{font-size:11px;font-weight:600;color:var(--muted)}
+.alert{border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:14px}
+.alert.warn{background:var(--warnbg);color:var(--warn);border:1px solid #f3c99b}
+.alert.ok{background:var(--accent2);color:var(--accent);border:1px solid #b9d1c1}
+.alert ul{margin:6px 0 0 18px;padding:0}
+table.st{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+table.st th,table.st td{padding:7px 10px;border-top:1px solid var(--line);text-align:left}
+table.st th{white-space:nowrap;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.03em}
+table.st td.num,table.st th.num{text-align:right}
+textarea{width:100%;min-height:220px;padding:10px;border:1px solid var(--line);border-radius:10px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace}
+.muted{color:var(--muted)}
+h2{font-size:16px;margin:18px 0 8px}
+.rules td{padding:4px 8px;border-top:1px solid var(--line);font-size:13px;vertical-align:top}
+#print{display:none}
+@media (max-width:420px){.row{grid-template-columns:18px 1fr 44px 62px 62px;gap:6px;padding:7px 10px}}
+/* ---------- PRINT ---------- */
+@page{size:letter;margin:0}
+@media print{
+  body{background:#fff}
+  header,main{display:none!important}
+  #print{display:block}
+  .pg{width:8.5in;height:11in;page-break-after:always;break-after:page;position:relative;overflow:hidden}
+  .pg:last-child{page-break-after:auto;break-after:auto}
+}
+.pg{font-family:Arial,Helvetica,sans-serif;color:#000}
+.sc3{height:3.6667in;padding:.2in .25in 0;border-bottom:1px dashed #999;position:relative}
+.sc3:last-child{border-bottom:0}
+.schead{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;font-weight:700;font-size:15pt;margin-bottom:6pt}
+.schead .r{text-align:right}
+.badge{display:inline-block;background:#000;color:#fff;font-size:11pt;padding:2pt 7pt;border-radius:3pt}
+table.card{border-collapse:collapse;width:8in;table-layout:fixed;font-size:8pt}
+table.card td{border:.5pt solid #8c8c8c;text-align:center;padding:0;height:13pt;overflow:hidden;white-space:nowrap}
+table.card tr.hd td{background:#d9d9d9;font-weight:700}
+table.card tr.par td{font-weight:700}
+table.card tr.dist td{font-size:6.4pt}
+table.card tr.pl td{height:28pt}
+table.card td.lab{text-align:left;padding-left:4pt;font-weight:700}
+table.card td.sub{background:#f0f0f0;font-weight:700;border-left:1.2pt solid #000;border-right:1.2pt solid #000}
+table.card td.hl{background:#e8e8e8}
+table.card tr.hd td.hl{background:#a6a6a6}
+table.card tr.dist td{border-bottom:1.2pt solid #000}
+table.card td.pn{text-align:left;padding:0 4pt;font-size:9pt;font-weight:400;border-right:1.2pt solid #000}
+table.card td.pn .pw{display:flex;align-items:center}table.card td.pn .pnm{flex:1;overflow:hidden;text-overflow:ellipsis}table.card td.pn .pd{font-weight:700;font-size:7.2pt;margin-left:3pt}
+table.card td.pn .pi{color:#555;font-size:7.5pt;margin-right:4pt}
+table.card{border:1.2pt solid #000}
+.init{display:flex;align-items:center;gap:6pt;margin-top:6pt;font-size:8.5pt;font-weight:700}
+.init .b{flex:1;height:18pt;border:.8pt solid #000;font-size:7pt;font-weight:400;color:#555;padding:1pt 3pt}
+.note{font-size:6.8pt;color:#555;margin-top:3pt}
+.plist{padding:.45in .5in}
+.plist h1{font-size:18pt;margin:0 0 2pt}
+.plist .sub{font-size:9pt;color:#555;margin-bottom:10pt}
+.plist .cols{columns:2;column-gap:.35in}
+.plist .h{break-inside:avoid;margin-bottom:8pt;border:1pt solid #000}
+.plist .h b{display:block;background:#d9d9d9;padding:2pt 5pt;font-size:10pt}
+.plist .h div{display:flex;justify-content:space-between;padding:1.5pt 5pt;font-size:9pt;border-top:.5pt solid #bbb}
+.plist .h div span:last-child{font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <h1>Baker Bay DGC <span>· Round 2 Cards</span></h1>
+  <nav>
+    <button data-tab="r1" class="on">Scores</button>
+    <button data-tab="r2">Round 2 Cards</button>
+    <button data-tab="st">Standings</button>
+    <button data-tab="setup">Setup</button>
+  </nav>
+</header>
+<main>
+  <section id="r1" class="panel on">
+    <div class="bar">
+      <input type="search" id="q" placeholder="Search player or division…" autocomplete="off">
+    </div>
+    <div class="bar"><span class="progress" id="prog"></span></div>
+    <div id="r1list"></div>
+  </section>
+  <section id="r2" class="panel">
+    <div id="r2warn"></div>
+    <div class="bar">
+      <button class="btn" id="printCards">Print Round 2 official cards</button>
+      <button class="btn ghost" id="printList">Print pairings list</button>
+    </div>
+    <div id="r2list"></div>
+  </section>
+  <section id="st" class="panel">
+    <p class="muted" style="margin-top:0">Lowest score wins. Ties share a place (T2). Event total shows once both rounds are entered.</p>
+    <div id="stlist"></div>
+  </section>
+  <section id="setup" class="panel">
+    <h2 style="margin-top:0">Round 1 groups</h2>
+    <p class="muted">Paste updated Round 1 hole assignments in the same format you send them (<code>Hole 1</code> then <code>1. MPO: Name</code> lines) and tap Update. Scores already entered stay attached to each player by name.</p>
+    <textarea id="groupsTxt" spellcheck="false"></textarea>
+    <div class="bar" style="margin-top:8px">
+      <button class="btn" id="applyGroups">Update groups</button>
+      <button class="btn ghost" id="resetGroups">Restore original groups</button>
+    </div>
+    <div id="groupsMsg"></div>
+    <h2>Round 2 hole rules</h2>
+    <p class="muted">Within each pool, players are ranked by Round 1 total (lowest first) and handed out top-down in this order. Hole 18 keeps its Round 1 group and those players are left out of the pools. On every card the lowest Round 1 score throws first.</p>
+    <table class="rules" id="rulesTbl"></table>
+    <h2>Data</h2>
+    <div class="bar">
+      <button class="btn ghost" id="exportCsv">Export scores (CSV)</button>
+      <button class="btn danger" id="clearScores">Clear all scores</button>
+    </div>
+    <p class="muted" style="font-size:13px">Scores are saved on this device in this browser. Works fully offline.</p>
+  </section>
+</main>
+<div id="print"></div>
+<script>
+"use strict";
+const PAR=[3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3], DIST=[230, 288, 595, 483, 247, 258, 270, 223, 367, 330, 313, 300, 205, 175, 225, 258, 330, 290];
+const DEFAULT_GROUPS={"1": [["MPO", "Travis VanKrause"], ["MPO", "Tad Brentano"], ["MPO", "Randy Gourley"], ["MPO", "Dustin Keegan"], ["MPO", "Talon Thomas"]], "2": [["MPO", "Tony Petrauski"], ["MPO", "Andrew Mross"], ["MPO", "Alex Ourant"], ["MP40", "Zoe AnDyke"], ["MP40", "Casey Lyon"]], "3": [["MPO", "Josiah Savage Magee"], ["MPO", "Benjamin Harter"], ["MPO", "Dennis Anglo"], ["MA1", "DJ Hanks"], ["MA1", "Dillon Darr"]], "4": [["MP40", "Gregg Sutton"], ["MP40", "Ryan Yokum"], ["MP40", "Benny Bond"], ["MP40", "James Morse"], ["MP40", "Adam Gute"]], "5": [["MP40", "Andy Hock"], ["MP40", "Will Larson"], ["MP40", "Jeff Ballard"], ["MP40", "Dana Burchett"], ["MP40", "Michael Morgan"]], "6": [["MP40", "Kyle Coates"], ["MP40", "Kenny Shelton"], ["MP40", "Anthoney P Mahoney"], ["MP40", "Jason Silverman"], ["MP40", "Sean Debate"]], "7": [["MP50", "Jon Wilson"], ["MP50", "Montana Rohrback"], ["MP50", "Wes Chumley"], ["MP50", "Nelson Marcello"], ["MP50", "Jans Ingber"]], "8": [["MP50", "Brandon Hill"], ["MP50", "Scott Wales"], ["MP50", "Marx Ramirez"], ["MP50", "Matt Benotsch"], ["MP50", "Bobby Goodridge"]], "9": [["MP50", "Jesse Grasseth"], ["MP50", "John Fitzgerald"], ["MP50", "Max Cole"], ["MP50", "Gerald Bruce"], ["MP50", "Ruben Gutierrez"]], "10": [["MA1", "Stephen Zylinski"], ["MA1", "Nathan Goldbright"], ["MA1", "Darren Heredia"], ["MA1", "Cody Jones"], ["MA1", "Martin Rodriguez"]], "11": [["MA1", "Kamdan Wilson"], ["MA1", "Josh James"], ["MA1", "Sitceles Fry"], ["FA2", "Madolyn Sprague"], ["MA2", "Ryder White"]], "12": [["MA40", "Gary Campbell"], ["MA40", "Dallas Ward"], ["MA40", "Keegan McEachern"], ["MA40", "Geoff Davis"], ["MA40", "Jake Whitson"]], "13": [["MA40", "Steve A Smith"], ["MA40", "Abraham Smith"], ["MA40", "Nick Baldry"], ["MA40", "Keith Clark"], ["MA40", "Matt Mathiason"]], "14": [["MA50", "Rick Godden"], ["MA50", "Jerry Reller"], ["MA50", "Terry Schulz"], ["MA40", "Rusty Byers"], ["MA40", "Cody Holder"]], "15": [["MA50", "Adam Rud"], ["MA50", "Rob Cole"], ["FA50", "Holly DeWit"], ["FA50", "Yuki Reller"], ["MA50", "Jeff Harms"]], "16": [["MA40", "T.J. Sanders"], ["MA40", "Lorenzo Montoya"], ["MA60", "Doug Heiken"], ["MA60", "Jim Pierik"], ["FA2", "Rebecca Duffy"]], "17": [["MA2", "Terrance M"], ["MA2", "John Poetker"], ["MA2", "Charles Sutton"], ["MA3", "Shawn Morriss"], ["MA3", "Scott Beery"]], "18": [["MP40", "Derrick Price"], ["MJ18", "Jaxon Price"], ["FJ18", "Sofia Campbell"], ["MP50", "Mark Scheid"], ["MJ18", "Mateo Scheid"]]};
+const FIXED_HOLE=18;
+// Pools: ranked list handed out top-down. n = how many go to that hole; last entry takes the rest.
+const POOLS=[
+  {name:"MPO",divs:["MPO"],seq:[[1,5],[2,3],[3,"rest"]]},
+  {name:"MP40",divs:["MP40"],seq:[[4,5],[5,5],[6,5],[2,"rest"]]},
+  {name:"MP50",divs:["MP50"],seq:[[7,5],[8,5],[9,"rest"]]},
+  {name:"MA1",divs:["MA1"],seq:[[10,5],[11,3],[3,"rest"]]},
+  {name:"FA2",divs:["FA2"],seq:[[11,"rest"]]},
+  {name:"MA40",divs:["MA40"],seq:[[12,5],[13,5],[15,2],[16,"rest"]]},
+  {name:"MA50 + FA50",divs:["MA50","FA50"],seq:[[14,5],[15,"rest"]]},
+  {name:"MA60",divs:["MA60"],seq:[[16,"rest"]]},
+  {name:"MA2",divs:["MA2"],seq:[[17,3],[16,"rest"]]},
+  {name:"MA3",divs:["MA3"],seq:[[17,"rest"]]}
+];
+const DIV_ORDER=["MPO","MP40","MP50","MA1","MA40","MA50","FA50","MA60","MA2","FA2","MA3","MJ18","FJ18"];
+const KEY="bbdgc-r2-v1";
+let S={groups:DEFAULT_GROUPS,r1:{},r2:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.groups)S=Object.assign(S,s);}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function roster(){const out=[];Object.keys(S.groups).map(Number).sort((a,b)=>a-b).forEach(h=>S.groups[h].forEach((p,i)=>out.push({name:p[1],div:p[0],h1:h,pos:i+1})));return out}
+const sc=(m,n)=>{const v=m[n];return (v===undefined||v===""||v===null)?null:Number(v)};
+
+// ---------- tabs ----------
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("on",p.id===b.dataset.tab));
+  render(b.dataset.tab);window.scrollTo(0,0);
+});
+
+// ---------- scores ----------
+function renderScores(){
+  const q=$("#q").value.trim().toLowerCase();
+  const R=roster();
+  const n1=R.filter(p=>sc(S.r1,p.name)!==null).length,n2=R.filter(p=>sc(S.r2,p.name)!==null).length;
+  $("#prog").innerHTML=`<span class="pill">R1 ${n1}/${R.length}</span> <span class="pill">R2 ${n2}/${R.length}</span>`;
+  let html="";
+  Object.keys(S.groups).map(Number).sort((a,b)=>a-b).forEach(h=>{
+    const ps=R.filter(p=>p.h1===h&&(!q||p.name.toLowerCase().includes(q)||p.div.toLowerCase()===q||String(h)===q));
+    if(!ps.length)return;
+    html+=`<div class="grp"><h3>Round 1 · Hole ${h}<small>${h===FIXED_HOLE?"same card both rounds":""}</small></h3>
+    <div class="row hdr"><span>#</span><span>Player</span><span>Div</span><span style="text-align:center">Rd 1</span><span style="text-align:center">Rd 2</span></div>`;
+    ps.forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);
+      html+=`<div class="row"><span class="n">${p.pos}</span><span class="nm">${esc(p.name)}</span><span class="dv">${p.div}</span>
+      <input inputmode="numeric" pattern="[0-9]*" data-r="r1" data-n="${esc(p.name)}" value="${a??""}" class="${a!==null?"filled":""}" aria-label="Round 1 ${esc(p.name)}">
+      <input inputmode="numeric" pattern="[0-9]*" data-r="r2" data-n="${esc(p.name)}" value="${b??""}" class="${b!==null?"filled":""}" aria-label="Round 2 ${esc(p.name)}"></div>`});
+    html+=`</div>`;
+  });
+  $("#r1list").innerHTML=html||`<p class="muted">No players match.</p>`;
+}
+$("#r1list").addEventListener("input",e=>{
+  const t=e.target;if(!t.dataset.r)return;
+  const v=t.value.replace(/[^0-9]/g,"");t.value=v;
+  if(v==="")delete S[t.dataset.r][t.dataset.n];else S[t.dataset.r][t.dataset.n]=Number(v);
+  t.classList.toggle("filled",v!=="");save();
+  const R=roster();
+  $("#prog").innerHTML=`<span class="pill">R1 ${R.filter(p=>sc(S.r1,p.name)!==null).length}/${R.length}</span> <span class="pill">R2 ${R.filter(p=>sc(S.r2,p.name)!==null).length}/${R.length}</span>`;
+});
+$("#q").addEventListener("input",renderScores);
+
+// ---------- round 2 engine ----------
+function buildR2(){
+  const R=roster(),warn=[],holes={};
+  for(let h=1;h<=18;h++)holes[h]=[];
+  const tieNames=new Set();
+  const key=p=>{const v=sc(S.r1,p.name);return v===null?Infinity:v};
+  const missing=R.filter(p=>p.h1!==FIXED_HOLE&&sc(S.r1,p.name)===null);
+  if(missing.length)warn.push(`${missing.length} player${missing.length>1?"s have":" has"} no Round 1 score yet and ${missing.length>1?"are":"is"} ranked last: `+missing.map(p=>esc(p.name)).join(", "));
+  // fixed hole
+  R.filter(p=>p.h1===FIXED_HOLE).forEach(p=>holes[FIXED_HOLE].push({...p,fixed:true}));
+  const used=new Set(holes[FIXED_HOLE].map(p=>p.name));
+  POOLS.forEach(pool=>{
+    const ps=R.filter(p=>p.h1!==FIXED_HOLE&&pool.divs.includes(p.div))
+      .sort((a,b)=>key(a)-key(b)||a.h1-b.h1||a.pos-b.pos);
+    let i=0;
+    pool.seq.forEach(([h,n],k)=>{
+      const take=n==="rest"?ps.length-i:Math.min(n,ps.length-i);
+      const seg=ps.slice(i,i+take);
+      // tie across a cut line
+      if(i+take<ps.length&&take>0){const last=seg[seg.length-1],next=ps[i+take];
+        if(key(last)===key(next)&&key(last)!==Infinity){ps.filter(p=>key(p)===key(last)).forEach(p=>tieNames.add(p.name));}}
+      seg.forEach(p=>{holes[h].push(p);used.add(p.name)});
+      i+=take;
+    });
+  });
+  const left=R.filter(p=>!used.has(p.name));
+  if(left.length)warn.push("Not covered by any hole rule (check divisions): "+left.map(p=>`${esc(p.name)} (${p.div})`).join(", "));
+  for(let h=1;h<=18;h++){
+    holes[h].sort((a,b)=>key(a)-key(b)||a.h1-b.h1||a.pos-b.pos);
+    if(holes[h].length!==5)warn.push(`Hole ${h} has ${holes[h].length} players (expected 5).`);
+  }
+  if(tieNames.size)warn.push("Tied Round 1 scores fall across a card cut line (marked TIE). Tied players are split by Round 1 hole order — break ties your own way if you prefer.");
+  return {holes,warn,tieNames};
+}
+function renderR2(){
+  const {holes,warn,tieNames}=buildR2();
+  $("#r2warn").innerHTML=warn.length?`<div class="alert warn"><b>Check before printing</b><ul>${warn.map(w=>`<li>${w}</li>`).join("")}</ul></div>`
+    :`<div class="alert ok"><b>All 90 players placed.</b> Lowest Round 1 score throws first on each card.</div>`;
+  let html="";
+  for(let h=1;h<=18;h++){
+    html+=`<div class="grp"><h3>Round 2 · Hole ${h}<small>${h===FIXED_HOLE?"same group as Round 1":""}</small></h3>`;
+    holes[h].forEach((p,i)=>{const v=sc(S.r1,p.name);
+      html+=`<div class="r2row"><span class="n">${i+1}</span><span class="nm">${esc(p.name)}${tieNames.has(p.name)?'<span class="tie">TIE</span>':""}</span><span class="dv">${p.div}</span><span class="sc">${v??"–"}</span></div>`});
+    html+=`</div>`;
+  }
+  $("#r2list").innerHTML=html;
+}
+
+// ---------- standings ----------
+function places(list,f){let out=[],prev=null,place=0;list.forEach((p,i)=>{const v=f(p);if(v!==prev){place=i+1;prev=v}out.push(place)});
+  return out.map((pl,i)=>{const same=out.filter(x=>x===pl).length>1;return (same?"T":"")+pl})}
+function renderSt(){
+  const R=roster();let html="";
+  const divs=[...DIV_ORDER.filter(d=>R.some(p=>p.div===d)),...[...new Set(R.map(p=>p.div))].filter(d=>!DIV_ORDER.includes(d))];
+  divs.forEach(d=>{
+    const ps=R.filter(p=>p.div===d).map(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);return {...p,a,b,t:(a!==null&&b!==null)?a+b:null}});
+    const anyT=ps.some(p=>p.t!==null);
+    const f=p=>anyT?(p.t??(p.a!==null?1000+p.a:1e9)):(p.a??1e9);
+    ps.sort((x,y)=>f(x)-f(y)||x.name.localeCompare(y.name));
+    const pl=places(ps,f);
+    html+=`<div class="grp"><h3>${d}<small>${ps.length} players</small></h3><table class="st"><tr><th>Pl</th><th>Player</th><th class="num">Rd 1</th><th class="num">Rd 2</th><th class="num">Total</th></tr>`;
+    ps.forEach((p,i)=>{const has=anyT?p.t!==null:p.a!==null;
+      html+=`<tr><td>${has?pl[i]:"–"}</td><td>${esc(p.name)}</td><td class="num">${p.a??"–"}</td><td class="num">${p.b??"–"}</td><td class="num"><b>${p.t??"–"}</b></td></tr>`});
+    html+=`</table></div>`;
+  });
+  $("#stlist").innerHTML=html;
+}
+
+// ---------- setup ----------
+function groupsToText(g){return Object.keys(g).map(Number).sort((a,b)=>a-b).map(h=>`Hole ${h}\n`+g[h].map((p,i)=>`${i+1}. ${p[0]}: ${p[1]}`).join("\n")).join("\n\n")}
+function parseGroups(t){
+  const g={};let cur=null;
+  t.split(/\r?\n/).forEach(line=>{line=line.trim();if(!line)return;
+    let m=line.match(/^Hole\s+(\d+)/i);if(m){cur=+m[1];g[cur]=[];return}
+    m=line.match(/^\d+[.)]\s*([A-Za-z0-9]+)\s*:\s*(.+)$/);
+    if(m&&cur!==null)g[cur].push([m[1].toUpperCase(),m[2].trim()]);
+  });
+  return g;
+}
+function renderSetup(){
+  $("#groupsTxt").value=groupsToText(S.groups);
+  $("#rulesTbl").innerHTML=`<tr><td><b>Pool</b></td><td><b>Hand-out order (top → bottom)</b></td></tr>`+POOLS.map(p=>`<tr><td>${p.name}</td><td>${p.seq.map(([h,n])=>`Hole ${h}: ${n==="rest"?"rest":n}`).join(" → ")}</td></tr>`).join("")+`<tr><td>Hole 18 group</td><td>Stays together on Hole 18; not ranked into other cards</td></tr>`;
+}
+$("#applyGroups").onclick=()=>{
+  const g=parseGroups($("#groupsTxt").value);const names=Object.values(g).flat().map(p=>p[1]);
+  const dup=names.filter((n,i)=>names.indexOf(n)!==i);
+  if(!Object.keys(g).length){$("#groupsMsg").innerHTML=`<div class="alert warn">Couldn't read any holes. Use "Hole 1" then "1. MPO: Name" lines.</div>`;return}
+  if(dup.length){$("#groupsMsg").innerHTML=`<div class="alert warn">Duplicate players: ${dup.map(esc).join(", ")}</div>`;return}
+  S.groups=g;save();$("#groupsMsg").innerHTML=`<div class="alert ok">Updated: ${Object.keys(g).length} holes, ${names.length} players.</div>`;renderSetup();
+};
+$("#resetGroups").onclick=()=>{if(confirm("Restore the original Round 1 groups?")){S.groups=DEFAULT_GROUPS;save();renderSetup();$("#groupsMsg").innerHTML=""}};
+$("#clearScores").onclick=()=>{if(confirm("Clear ALL Round 1 and Round 2 scores on this device?")){S.r1={};S.r2={};save();$("#groupsMsg").innerHTML=`<div class="alert ok">Scores cleared.</div>`}};
+$("#exportCsv").onclick=()=>{
+  const rows=[["Division","Player","Round 1 Hole","Round 1","Round 2","Total"]];
+  roster().forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);rows.push([p.div,p.name,p.h1,a??"",b??"",(a!==null&&b!==null)?a+b:""])});
+  const csv=rows.map(r=>r.map(v=>/[",]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="baker-bay-scores.csv";document.body.appendChild(a);a.click();a.remove();
+};
+
+// ---------- print ----------
+const sum=a=>a.reduce((x,y)=>x+y,0);
+function cardHTML(h,players){
+  const cols=[...Array(9)].map((_,i)=>i+1).concat(["out"],[...Array(9)].map((_,i)=>i+10),["in","tot"]);
+  const val=(row,k)=>{if(k==="out")return row==="h"?"Out":row==="p"?sum(PAR.slice(0,9)):sum(DIST.slice(0,9)).toLocaleString();
+    if(k==="in")return row==="h"?"In":row==="p"?sum(PAR.slice(9)):sum(DIST.slice(9)).toLocaleString();
+    if(k==="tot")return row==="h"?"Total":row==="p"?sum(PAR):sum(DIST).toLocaleString();
+    return row==="h"?k:row==="p"?PAR[k-1]:DIST[k-1]};
+  const cls=k=>(typeof k==="string"?"sub":"")+(k===h?" hl":"");
+  const cg=`<colgroup><col style="width:1.64in">${cols.map(k=>`<col style="width:${typeof k==="string"?(k==="tot"?.444:.333):.2917}in">`).join("")}</colgroup>`;
+  const hdr=(row,lab,c)=>`<tr class="${c}"><td class="lab">${lab}</td>${cols.map(k=>`<td class="${cls(k)}">${val(row,k)}</td>`).join("")}</tr>`;
+  let rows="";
+  for(let i=0;i<5;i++){const p=players[i];
+    const fs=p?(p.name.length>17?7.4:p.name.length>14?8.3:9):9;
+    rows+=`<tr class="pl"><td class="pn" style="font-size:${fs}pt"><div class="pw"><span class="pi">${i+1}</span><span class="pnm">${p?esc(p.name):""}</span><span class="pd">${p?p.div:""}</span></div></td>${cols.map(k=>`<td class="${cls(k)}"></td>`).join("")}</tr>`}
+  return `<div class="sc3"><div class="schead"><div><span class="badge">OFFICIAL SCORECARD</span></div><div>Baker Bay - Round 2</div><div class="r">Starting Hole ${h}</div></div>
+  <table class="card">${cg}${hdr("h","Hole","hd")}${hdr("p","Par","par")}${hdr("d","Dist","dist")}${rows}</table>
+  <div class="init">Player initials (all players verify this card):${[1,2,3,4,5].map(n=>`<div class="b">${n}</div>`).join("")}</div>
+  <div class="note">Hole notes may change before the event. Check PDGA Live for current notes.</div></div>`;
+}
+function doPrint(html){$("#print").innerHTML=html;setTimeout(()=>window.print(),50)}
+$("#printCards").onclick=()=>{const {holes}=buildR2();let html="";
+  for(let h=1;h<=18;h+=3)html+=`<div class="pg">${[h,h+1,h+2].map(x=>cardHTML(x,holes[x])).join("")}</div>`;doPrint(html)};
+$("#printList").onclick=()=>{const {holes}=buildR2();
+  let html=`<div class="pg plist"><h1>Baker Bay DGC · Round 2 Pairings</h1><div class="sub">Lowest Round 1 score throws first. Round 1 total shown at right.</div><div class="cols">`;
+  for(let h=1;h<=18;h++)html+=`<div class="h"><b>Hole ${h}</b>${holes[h].map((p,i)=>`<div><span>${i+1}. ${esc(p.name)} <span style="font-weight:400;color:#555">${p.div}</span></span><span>${sc(S.r1,p.name)??"–"}</span></div>`).join("")}</div>`;
+  doPrint(html+`</div></div>`)};
+
+function render(t){if(t==="r1")renderScores();if(t==="r2")renderR2();if(t==="st")renderSt();if(t==="setup")renderSetup()}
+render("r1");
+
+// ---------- offline support ----------
+if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+</script>
+</body>
+</html>
