@@ -1,5 +1,5 @@
 // Baker Bay DGC – offline cache. Bump VERSION when you upload a new index.html.
-const VERSION = "bakerbay-v3";
+const VERSION = "bakerbay-v4";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
