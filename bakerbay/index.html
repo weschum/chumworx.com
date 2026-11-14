@@ -41,6 +41,8 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .row input{width:100%;padding:9px 6px;border:1px solid var(--line);border-radius:8px;font-weight:600;font-size:17px;font-family:inherit;text-align:center;background:#fff}
 .row input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
 .row input.filled{background:var(--accent2);border-color:#b9d1c1}
+.row input.odd{background:var(--warnbg);border:2px solid var(--warn);color:var(--warn)}
+.pill.odd{background:var(--warnbg);color:var(--warn)}
 .r2row{display:grid;grid-template-columns:22px 1fr 54px 48px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
 .r2row .sc{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
 .tie{font-size:10px;font-weight:800;color:var(--warn);background:var(--warnbg);border-radius:4px;padding:1px 4px;margin-left:6px;vertical-align:1px}
@@ -189,11 +191,20 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
 });
 
 // ---------- scores ----------
+// Par is 56: flag scores under 40 or over 80 for a double check (still allowed).
+const ODD_LO=40,ODD_HI=80;
+const odd=v=>v!==null&&(v<ODD_LO||v>ODD_HI);
+const inCls=v=>(v!==null?"filled":"")+(odd(v)?" odd":"");
+function renderProg(){
+  const R=roster();
+  const n1=R.filter(p=>sc(S.r1,p.name)!==null).length,n2=R.filter(p=>sc(S.r2,p.name)!==null).length;
+  const nOdd=R.filter(p=>odd(sc(S.r1,p.name))).length+R.filter(p=>odd(sc(S.r2,p.name))).length;
+  $("#prog").innerHTML=`<span class="pill">R1 ${n1}/${R.length}</span> <span class="pill">R2 ${n2}/${R.length}</span>`+(nOdd?` <span class="pill odd" title="Scores under ${ODD_LO} or over ${ODD_HI}">${nOdd} to double-check</span>`:"");
+}
 function renderScores(){
   const q=$("#q").value.trim().toLowerCase();
   const R=roster();
-  const n1=R.filter(p=>sc(S.r1,p.name)!==null).length,n2=R.filter(p=>sc(S.r2,p.name)!==null).length;
-  $("#prog").innerHTML=`<span class="pill">R1 ${n1}/${R.length}</span> <span class="pill">R2 ${n2}/${R.length}</span>`;
+  renderProg();
   let html="";
   Object.keys(S.groups).map(Number).sort((a,b)=>a-b).forEach(h=>{
     const ps=R.filter(p=>p.h1===h&&(!q||p.name.toLowerCase().includes(q)||p.div.toLowerCase()===q||String(h)===q));
@@ -202,8 +213,8 @@ function renderScores(){
     <div class="row hdr"><span>#</span><span>Player</span><span>Div</span><span style="text-align:center">Rd 1</span><span style="text-align:center">Rd 2</span></div>`;
     ps.forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);
       html+=`<div class="row"><span class="n">${p.pos}</span><span class="nm">${esc(p.name)}</span><span class="dv">${p.div}</span>
-      <input inputmode="numeric" pattern="[0-9]*" data-r="r1" data-n="${esc(p.name)}" value="${a??""}" class="${a!==null?"filled":""}" aria-label="Round 1 ${esc(p.name)}">
-      <input inputmode="numeric" pattern="[0-9]*" data-r="r2" data-n="${esc(p.name)}" value="${b??""}" class="${b!==null?"filled":""}" aria-label="Round 2 ${esc(p.name)}"></div>`});
+      <input inputmode="numeric" pattern="[0-9]*" data-r="r1" data-n="${esc(p.name)}" value="${a??""}" class="${inCls(a)}" aria-label="Round 1 ${esc(p.name)}">
+      <input inputmode="numeric" pattern="[0-9]*" data-r="r2" data-n="${esc(p.name)}" value="${b??""}" class="${inCls(b)}" aria-label="Round 2 ${esc(p.name)}"></div>`});
     html+=`</div>`;
   });
   $("#r1list").innerHTML=html||`<p class="muted">No players match.</p>`;
@@ -213,8 +224,14 @@ $("#r1list").addEventListener("input",e=>{
   const v=t.value.replace(/[^0-9]/g,"");t.value=v;
   if(v==="")delete S[t.dataset.r][t.dataset.n];else S[t.dataset.r][t.dataset.n]=Number(v);
   t.classList.toggle("filled",v!=="");save();
-  const R=roster();
-  $("#prog").innerHTML=`<span class="pill">R1 ${R.filter(p=>sc(S.r1,p.name)!==null).length}/${R.length}</span> <span class="pill">R2 ${R.filter(p=>sc(S.r2,p.name)!==null).length}/${R.length}</span>`;
+  // Don't flag the first digit while typing (e.g. "5" on the way to "56"); check once 2+ digits are in.
+  t.classList.toggle("odd",v.length>=2&&odd(Number(v)));
+  renderProg();
+});
+// When the field is left, flag whatever was entered, including a single digit.
+$("#r1list").addEventListener("change",e=>{
+  const t=e.target;if(!t.dataset.r)return;
+  t.classList.toggle("odd",odd(t.value===""?null:Number(t.value)));
 });
 $("#q").addEventListener("input",renderScores);
 
