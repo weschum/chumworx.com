@@ -46,6 +46,12 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .seg{display:inline-flex;margin-left:auto;border:1px solid var(--accent);border-radius:8px;overflow:hidden}
 .seg button{appearance:none;border:0;background:#fff;color:var(--accent);font-family:inherit;font-weight:600;font-size:13px;padding:6px 10px;cursor:pointer}
 .seg button.on{background:var(--accent);color:#fff}
+.cirow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cirow input{width:24px;height:24px;margin:0;flex:none;accent-color:var(--accent)}
+.cirow .nm{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cirow .h{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.cirow.in{background:var(--accent2)}
+.cirow.in .nm{color:var(--accent)}
 .r2row{display:grid;grid-template-columns:22px 1fr 54px 48px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
 .r2row .sc{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
 .tie{font-size:10px;font-weight:800;color:var(--warn);background:var(--warnbg);border-radius:4px;padding:1px 4px;margin-left:6px;vertical-align:1px}
@@ -63,6 +69,7 @@ textarea{width:100%;min-height:220px;padding:10px;border:1px solid var(--line);b
 h2{font-size:16px;margin:18px 0 8px}
 .rules td{padding:4px 8px;border-top:1px solid var(--line);font-size:13px;vertical-align:top}
 #print{display:none}
+@media (max-width:420px){nav button{padding:10px 6px;font-size:13px}}
 @media (max-width:420px){.row{grid-template-columns:18px 1fr 44px 62px 62px;gap:6px;padding:7px 10px}}
 /* ---------- PRINT ---------- */
 @page{size:letter;margin:0}
@@ -111,13 +118,23 @@ table.card{border:1.2pt solid #000}
 <header>
   <h1>Baker Bay DGC <span>· Round 2 Cards</span></h1>
   <nav>
+    <button data-tab="ci">Check-in</button>
     <button data-tab="r1" class="on">Scores</button>
-    <button data-tab="r2">Round 2 Cards</button>
+    <button data-tab="r2">R2 Cards</button>
     <button data-tab="st">Standings</button>
     <button data-tab="setup">Setup</button>
   </nav>
 </header>
 <main>
+  <section id="ci" class="panel">
+    <div class="bar">
+      <input type="search" id="ciq" placeholder="Search player or division…" autocomplete="off">
+    </div>
+    <div class="bar"><span class="progress" id="ciprog"></span>
+      <span class="seg" role="group" aria-label="Show"><button type="button" data-cif="all" class="on">Show all</button><button type="button" data-cif="out">Hide checked in</button></span>
+    </div>
+    <div id="cilist"></div>
+  </section>
   <section id="r1" class="panel on">
     <div class="bar">
       <input type="search" id="q" placeholder="Search player or division…" autocomplete="off">
@@ -206,7 +223,7 @@ const POOLS=[
 ];
 const DIV_ORDER=["MPO","MP40","MP50","MA1","MA40","MA50","FA50","MA60","MA2","FA2","MA3","MJ18","FJ18"];
 const KEY="bbdgc-r2-v1";
-let S={groups:DEFAULT_GROUPS,r1:{},r2:{}};
+let S={groups:DEFAULT_GROUPS,r1:{},r2:{},ci:{}};
 // Bump GROUPS_VER whenever DEFAULT_GROUPS changes: phones then switch to the new groups (scores are kept by name).
 const GROUPS_VER=2; // v2: Jake Kasper (MA40) replaces Bobby Goodridge on hole 8
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.groups)S=Object.assign(S,s);}catch(e){}
@@ -418,7 +435,49 @@ $("#printList").onclick=()=>{const {holes}=buildR2();
   for(let h=1;h<=18;h++)html+=`<div class="h"><b>Hole ${h}</b>${holes[h].map((p,i)=>`<div><span>${i+1}. ${esc(p.name)} <span style="font-weight:400;color:#555">${p.div}</span></span><span>${sc(S.r1,p.name)??"–"}</span></div>`).join("")}</div>`;
   doPrint(html+`</div></div>`)};
 
-function render(t){if(t==="r1")renderScores();if(t==="r2")renderR2();if(t==="st")renderSt();if(t==="setup")renderSetup()}
+// ---------- check-in ----------
+// Grouped by division (DIV_ORDER), then by first name. Saved on this device by player name.
+let CIF="all";
+const firstName=n=>n.trim().split(/\s+/)[0];
+function renderCiProg(){
+  const R=roster(),n=R.filter(p=>S.ci[p.name]).length;
+  $("#ciprog").innerHTML=`<span class="pill">Checked in ${n}/${R.length}</span>`;
+}
+function renderCheckin(){
+  const q=$("#ciq").value.trim().toLowerCase();
+  const R=roster();
+  renderCiProg();
+  document.querySelectorAll("[data-cif]").forEach(b=>b.classList.toggle("on",b.dataset.cif===CIF));
+  const divs=[...DIV_ORDER,...new Set(R.map(p=>p.div).filter(d=>!DIV_ORDER.includes(d)))];
+  let html="";
+  divs.forEach(d=>{
+    const all=R.filter(p=>p.div===d);
+    if(!all.length)return;
+    const ps=all.filter(p=>(!q||p.name.toLowerCase().includes(q)||d.toLowerCase()===q)&&(CIF==="all"||!S.ci[p.name]))
+      .sort((a,b)=>firstName(a.name).localeCompare(firstName(b.name))||a.name.localeCompare(b.name));
+    if(!ps.length)return;
+    const nIn=all.filter(p=>S.ci[p.name]).length;
+    html+=`<div class="grp"><h3>${d}<small data-cid="${d}">${nIn}/${all.length} checked in</small></h3>`;
+    ps.forEach(p=>{const on=!!S.ci[p.name];
+      html+=`<label class="cirow${on?" in":""}"><input type="checkbox" data-ci="${esc(p.name)}" data-div="${d}"${on?" checked":""}><span class="nm">${esc(p.name)}</span><span class="h">R1 Hole ${p.h1}</span></label>`});
+    html+=`</div>`;
+  });
+  $("#cilist").innerHTML=html||`<p class="muted">${CIF==="out"&&!q?"Everyone is checked in.":"No players match."}</p>`;
+}
+$("#cilist").addEventListener("change",e=>{
+  const t=e.target;if(!t.dataset.ci)return;
+  if(t.checked)S.ci[t.dataset.ci]=true;else delete S.ci[t.dataset.ci];
+  save();
+  // Update in place (no re-render) so a player doesn't vanish mid-tap under "Not checked in".
+  t.closest(".cirow").classList.toggle("in",t.checked);
+  const d=t.dataset.div,all=roster().filter(p=>p.div===d);
+  const sm=document.querySelector(`[data-cid="${d}"]`);if(sm)sm.textContent=`${all.filter(p=>S.ci[p.name]).length}/${all.length} checked in`;
+  renderCiProg();
+});
+$("#ciq").addEventListener("input",renderCheckin);
+document.querySelectorAll("[data-cif]").forEach(b=>b.onclick=()=>{CIF=b.dataset.cif;renderCheckin();});
+
+function render(t){if(t==="ci")renderCheckin();if(t==="r1")renderScores();if(t==="r2")renderR2();if(t==="st")renderSt();if(t==="setup")renderSetup()}
 render("r1");
 
 // ---------- offline support ----------
