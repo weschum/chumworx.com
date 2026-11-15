@@ -166,6 +166,30 @@ table.card{border:1.2pt solid #000}
 const PAR=[3, 3, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3], DIST=[230, 288, 595, 483, 247, 258, 270, 223, 367, 330, 313, 300, 205, 175, 225, 258, 330, 290];
 const DEFAULT_GROUPS={"1": [["MPO", "Travis VanKrause"], ["MPO", "Tad Brentano"], ["MPO", "Randy Gourley"], ["MPO", "Dustin Keegan"], ["MPO", "Talon Thomas"]], "2": [["MPO", "Tony Petrauski"], ["MPO", "Andrew Mross"], ["MPO", "Alex Ourant"], ["MP40", "Zoe AnDyke"], ["MP40", "Casey Lyon"]], "3": [["MPO", "Josiah Savage Magee"], ["MPO", "Benjamin Harter"], ["MPO", "Dennis Anglo"], ["MA1", "DJ Hanks"], ["MA1", "Dillon Darr"]], "4": [["MP40", "Gregg Sutton"], ["MP40", "Ryan Yokum"], ["MP40", "Benny Bond"], ["MP40", "James Morse"], ["MP40", "Adam Gute"]], "5": [["MP40", "Andy Hock"], ["MP40", "Will Larson"], ["MP40", "Jeff Ballard"], ["MP40", "Dana Burchett"], ["MP40", "Michael Morgan"]], "6": [["MP40", "Kyle Coates"], ["MP40", "Kenny Shelton"], ["MP40", "Anthoney P Mahoney"], ["MP40", "Jason Silverman"], ["MP40", "Sean Debate"]], "7": [["MP50", "Jon Wilson"], ["MP50", "Montana Rohrback"], ["MP50", "Wes Chumley"], ["MP50", "Nelson Marcello"], ["MP50", "Jans Ingber"]], "8": [["MP50", "Brandon Hill"], ["MP50", "Scott Wales"], ["MP50", "Marx Ramirez"], ["MP50", "Matt Benotsch"], ["MA40", "Jake Kasper"]], "9": [["MP50", "Jesse Grasseth"], ["MP50", "John Fitzgerald"], ["MP50", "Max Cole"], ["MP50", "Gerald Bruce"], ["MP50", "Ruben Gutierrez"]], "10": [["MA1", "Stephen Zylinski"], ["MA1", "Nathan Goldbright"], ["MA1", "Darren Heredia"], ["MA1", "Cody Jones"], ["MA1", "Martin Rodriguez"]], "11": [["MA1", "Kamdan Wilson"], ["MA1", "Josh James"], ["MA1", "Sitceles Fry"], ["FA2", "Madolyn Sprague"], ["MA2", "Ryder White"]], "12": [["MA40", "Gary Campbell"], ["MA40", "Dallas Ward"], ["MA40", "Keegan McEachern"], ["MA40", "Geoff Davis"], ["MA40", "Jake Whitson"]], "13": [["MA40", "Steve A Smith"], ["MA40", "Abraham Smith"], ["MA40", "Nick Baldry"], ["MA40", "Keith Clark"], ["MA40", "Matt Mathiason"]], "14": [["MA50", "Rick Godden"], ["MA50", "Jerry Reller"], ["MA50", "Terry Schulz"], ["MA40", "Rusty Byers"], ["MA40", "Cody Holder"]], "15": [["MA50", "Adam Rud"], ["MA50", "Rob Cole"], ["FA50", "Holly DeWit"], ["FA50", "Yuki Reller"], ["MA50", "Jeff Harms"]], "16": [["MA40", "T.J. Sanders"], ["MA40", "Lorenzo Montoya"], ["MA60", "Doug Heiken"], ["MA60", "Jim Pierik"], ["FA2", "Rebecca Duffy"]], "17": [["MA2", "Terrance M"], ["MA2", "John Poetker"], ["MA2", "Charles Sutton"], ["MA3", "Shawn Morriss"], ["MA3", "Scott Beery"]], "18": [["MP40", "Derrick Price"], ["MJ18", "Jaxon Price"], ["FJ18", "Sofia Campbell"], ["MP50", "Mark Scheid"], ["MJ18", "Mateo Scheid"]]};
 const FIXED_HOLE=18;
+// PDGA numbers (not displayed). Round 2 tie-breaker: on equal Round 1 scores, the lower PDGA number goes first.
+const PDGA={
+  "Alex Ourant":316475,"Andrew Mross":302337,"Benjamin Harter":295889,"Dennis Anglo":328865,"Dustin Keegan":35187,
+  "Josiah Savage Magee":231346,"Randy Gourley":163430,"Tad Brentano":110803,"Talon Thomas":253044,"Tony Petrauski":186781,
+  "Travis VanKrause":35237,
+  "Adam Gute":151560,"Andy Hock":29435,"Anthoney P Mahoney":213958,"Benny Bond":100873,"Casey Lyon":102887,
+  "Dana Burchett":148315,"Derrick Price":192253,"Gregg Sutton":58730,"James Morse":122072,"Jason Silverman":272600,
+  "Jeff Ballard":87856,"Kenny Shelton":112835,"Kyle Coates":42765,"Michael Morgan":230021,"Ryan Yokum":58807,
+  "Sean Debate":113487,"Will Larson":29578,"Zoe AnDyke":39504,"Aaron Burke":134294,"Geremy Hewitt":52591,
+  "Brandon Hill":19975,"Gerald Bruce":208512,"Jans Ingber":151865,"Jesse Grasseth":35150,"John Fitzgerald":150403,
+  "Jon Wilson":146417,"Mark Scheid":35295,"Marx Ramirez":51747,"Matt Benotsch":29577,"Max Cole":60551,
+  "Montana Rohrback":146674,"Nelson Marcello":336145,"Ruben Gutierrez":277164,"Scott Wales":25268,"Wes Chumley":275601,
+  "Cody Jones":62787,"DJ Hanks":293165,"Darren Heredia":272877,"Dillon Darr":219422,"Josh James":193484,
+  "Kamdan Wilson":163264,"Martin Rodriguez":157542,"Nathan Goldbright":239205,"Sitceles Fry":297938,"Stephen Zylinski":194015,
+  "Abraham Smith":247420,"Cody Holder":311752,"Dallas Ward":199400,"Gary Campbell":145450,"Geoff Davis":241728,
+  "Jake Kasper":251579,"Jake Whitson":242080,"Keegan McEachern":233396,"Keith Clark":301855,"Lorenzo Montoya":318121,
+  "Matt Mathiason":318698,"Nick Baldry":292270,"Rusty Byers":18057,"Steve A Smith":235736,"T.J. Sanders":80648,
+  "Adam Rud":52802,"Jeff Harms":316765,"Jerry Reller":208214,"Rick Godden":89353,"Rob Cole":63787,"Terry Schulz":217022,
+  "Holly DeWit":100897,"Yuki Reller":208213,"Doug Heiken":212786,"Jim Pierik":225882,
+  "Charles Sutton":111769,"John Poetker":299627,"Ryder White":286668,"Terrance M":192504,
+  "Madolyn Sprague":333039,"Rebecca Duffy":33115,"Scott Beery":196093,"Shawn Morriss":260847,
+  "Jaxon Price":318587,"Mateo Scheid":318627,"Sofia Campbell":175526
+};
+const pdga=p=>PDGA[p.name]??Infinity; // no number on file → after numbered players, then Round 1 order
 // Pools: ranked list handed out top-down. n = how many go to that hole; last entry takes the rest.
 const POOLS=[
   {name:"MPO",divs:["MPO"],seq:[[1,5],[2,3],[3,"rest"]]},
@@ -270,6 +294,8 @@ function buildR2(){
   const R=roster(),warn=[],holes={};
   for(let h=1;h<=18;h++)holes[h]=[];
   const tieNames=new Set();
+  // Lower Round 1 score first; ties → lower PDGA number first; then Round 1 hole/position.
+  const r2order=(a,b)=>key(a)-key(b)||(pdga(a)-pdga(b)||0)||a.h1-b.h1||a.pos-b.pos;
   const key=p=>{const v=sc(S.r1,p.name);return v===null?Infinity:v};
   const missing=R.filter(p=>p.h1!==FIXED_HOLE&&sc(S.r1,p.name)===null);
   if(missing.length)warn.push(`${missing.length} player${missing.length>1?"s have":" has"} no Round 1 score yet and ${missing.length>1?"are":"is"} ranked last: `+missing.map(p=>esc(p.name)).join(", "));
@@ -278,7 +304,7 @@ function buildR2(){
   const used=new Set(holes[FIXED_HOLE].map(p=>p.name));
   POOLS.forEach(pool=>{
     const ps=R.filter(p=>p.h1!==FIXED_HOLE&&pool.divs.includes(p.div))
-      .sort((a,b)=>key(a)-key(b)||a.h1-b.h1||a.pos-b.pos);
+      .sort(r2order);
     let i=0;
     pool.seq.forEach(([h,n],k)=>{
       const take=n==="rest"?ps.length-i:Math.min(n,ps.length-i);
@@ -293,10 +319,10 @@ function buildR2(){
   const left=R.filter(p=>!used.has(p.name));
   if(left.length)warn.push("Not covered by any hole rule (check divisions): "+left.map(p=>`${esc(p.name)} (${p.div})`).join(", "));
   for(let h=1;h<=18;h++){
-    holes[h].sort((a,b)=>key(a)-key(b)||a.h1-b.h1||a.pos-b.pos);
+    holes[h].sort(r2order);
     if(holes[h].length!==5)warn.push(`Hole ${h} has ${holes[h].length} players (expected 5).`);
   }
-  if(tieNames.size)warn.push("Tied Round 1 scores fall across a card cut line (marked TIE). Tied players are split by Round 1 hole order — break ties your own way if you prefer.");
+  if(tieNames.size)warn.push("Tied Round 1 scores fall across a card cut line (marked TIE). Tied players are split by PDGA number — the lower number gets the higher card.");
   return {holes,warn,tieNames};
 }
 function renderR2(){
