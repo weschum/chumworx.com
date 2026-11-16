@@ -50,7 +50,7 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .seg button.on{background:var(--accent);color:#fff}
 .ciitem{border-top:1px solid var(--line)}
 .ciline{display:flex;align-items:stretch}
-.cirow{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 4px 10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cirow{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 4px 10px 12px;-webkit-tap-highlight-color:transparent}
 .cirow .who{flex:1;min-width:0}
 .cirow .nt{display:block;font-size:13px;font-weight:500;color:var(--warn);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cinb{flex:none;border:0;background:none;color:var(--muted);font-size:13px;font-weight:600;padding:0 12px;cursor:pointer}
@@ -58,7 +58,7 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .cied{display:flex;gap:8px;padding:0 12px 10px 48px}
 .cied input{flex:1;min-width:0;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
 .ciitem.in{background:var(--accent2)}
-.cirow input{width:24px;height:24px;margin:0;flex:none;accent-color:var(--accent)}
+.cirow input{width:28px;height:28px;margin:0;flex:none;accent-color:var(--accent);cursor:pointer}
 .cirow .nm{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cirow .h{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
 .ciitem.in .nm{color:var(--accent)}
@@ -535,7 +535,7 @@ function renderCheckin(){
     const nIn=all.filter(p=>S.ci[p.name]).length;
     html+=`<div class="grp"><h3>${d}<small data-cid="${d}">${nIn}/${all.length} checked in</small></h3>`;
     ps.forEach(p=>{const on=!!S.ci[p.name],nt=S.notes[p.name]||"",n=esc(p.name);
-      html+=`<div class="ciitem${on?" in":""}"><div class="ciline"><label class="cirow"><input type="checkbox" data-ci="${n}" data-div="${d}"${on?" checked":""}><span class="who"><span class="nm">${n}</span><span class="nt"${nt?"":" hidden"}>${esc(nt)}</span></span><span class="h">R1 Hole ${p.h1}</span></label>`+
+      html+=`<div class="ciitem${on?" in":""}"><div class="ciline"><div class="cirow"><input type="checkbox" aria-label="Check in ${n}" data-ci="${n}" data-div="${d}"${on?" checked":""}><span class="who"><span class="nm">${n}</span><span class="nt"${nt?"":" hidden"}>${esc(nt)}</span></span><span class="h">R1 Hole ${p.h1}</span></div>`+
         `<button type="button" class="cinb${nt?" has":""}" data-nb="${n}" aria-label="Note for ${n}">Note</button></div></div>`});
     html+=`</div>`;
   });
