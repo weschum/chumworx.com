@@ -47,12 +47,20 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .seg{display:inline-flex;margin-left:auto;border:1px solid var(--accent);border-radius:8px;overflow:hidden}
 .seg button{appearance:none;border:0;background:#fff;color:var(--accent);font-family:inherit;font-weight:600;font-size:13px;padding:6px 10px;cursor:pointer}
 .seg button.on{background:var(--accent);color:#fff}
-.cirow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--line);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ciitem{border-top:1px solid var(--line)}
+.ciline{display:flex;align-items:stretch}
+.cirow{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 4px 10px 12px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cirow .who{flex:1;min-width:0}
+.cirow .nt{display:block;font-size:13px;font-weight:500;color:var(--warn);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cinb{flex:none;border:0;background:none;color:var(--muted);font-size:13px;font-weight:600;padding:0 12px;cursor:pointer}
+.cinb.has{color:var(--warn)}
+.cied{display:flex;gap:8px;padding:0 12px 10px 48px}
+.cied input{flex:1;min-width:0;font-size:16px;padding:8px 10px;border:1px solid var(--line);border-radius:8px}
+.ciitem.in{background:var(--accent2)}
 .cirow input{width:24px;height:24px;margin:0;flex:none;accent-color:var(--accent)}
-.cirow .nm{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cirow .nm{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cirow .h{font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap}
-.cirow.in{background:var(--accent2)}
-.cirow.in .nm{color:var(--accent)}
+.ciitem.in .nm{color:var(--accent)}
 .r2row{display:grid;grid-template-columns:22px 1fr 54px 48px;gap:8px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
 .r2row .sc{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
 .tie{font-size:10px;font-weight:800;color:var(--warn);background:var(--warnbg);border-radius:4px;padding:1px 4px;margin-left:6px;vertical-align:1px}
@@ -238,7 +246,7 @@ const POOLS=[
 ];
 const DIV_ORDER=["MPO","MP40","MP50","MA1","MA40","MA50","FA50","MA60","MA2","FA2","MA3","MJ18","FJ18"];
 const KEY="bbdgc-r2-v1";
-let S={groups:DEFAULT_GROUPS,r1:{},r2:{},ci:{},st:{}};
+let S={groups:DEFAULT_GROUPS,r1:{},r2:{},ci:{},st:{},notes:{}};
 // Bump GROUPS_VER whenever DEFAULT_GROUPS changes: phones then switch to the new groups (scores are kept by name).
 const GROUPS_VER=3; // v2: Jake Kasper (MA40) replaces Bobby Goodridge on hole 8; v3: Geremy Hewitt (MP40) replaces Tony Petrauski on hole 2
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.groups)S=Object.assign(S,s);}catch(e){}
@@ -416,8 +424,8 @@ $("#applyGroups").onclick=()=>{
 $("#resetGroups").onclick=()=>{if(confirm("Restore the original Round 1 groups?")){S.groups=DEFAULT_GROUPS;save();renderSetup();$("#groupsMsg").innerHTML=""}};
 $("#clearScores").onclick=()=>{if(confirm("Clear ALL Round 1 and Round 2 scores on this device?")){S.r1={};S.r2={};save();$("#groupsMsg").innerHTML=`<div class="alert ok">Scores cleared.</div>`}};
 $("#exportCsv").onclick=()=>{
-  const rows=[["Division","Player","Round 1 Hole","Round 1","Round 2","Total"]];
-  roster().forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);rows.push([p.div,p.name,p.h1,a??"",b??"",(a!==null&&b!==null)?a+b:""])});
+  const rows=[["Division","Player","Round 1 Hole","Round 1","Round 2","Total","Checked in","Note"]];
+  roster().forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);rows.push([p.div,p.name,p.h1,a??"",b??"",(a!==null&&b!==null)?a+b:"",S.ci[p.name]?"yes":"",S.notes[p.name]||""])});
   const csv=rows.map(r=>r.map(v=>/[",]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="baker-bay-scores.csv";document.body.appendChild(a);a.click();a.remove();
 };
@@ -512,13 +520,14 @@ function renderCheckin(){
   divs.forEach(d=>{
     const all=R.filter(p=>p.div===d);
     if(!all.length)return;
-    const ps=all.filter(p=>(!q||p.name.toLowerCase().includes(q)||d.toLowerCase()===q)&&(CIF==="all"||!S.ci[p.name]))
+    const ps=all.filter(p=>(!q||p.name.toLowerCase().includes(q)||d.toLowerCase()===q||(S.notes[p.name]||"").toLowerCase().includes(q))&&(CIF==="all"||!S.ci[p.name]))
       .sort((a,b)=>firstName(a.name).localeCompare(firstName(b.name))||a.name.localeCompare(b.name));
     if(!ps.length)return;
     const nIn=all.filter(p=>S.ci[p.name]).length;
     html+=`<div class="grp"><h3>${d}<small data-cid="${d}">${nIn}/${all.length} checked in</small></h3>`;
-    ps.forEach(p=>{const on=!!S.ci[p.name];
-      html+=`<label class="cirow${on?" in":""}"><input type="checkbox" data-ci="${esc(p.name)}" data-div="${d}"${on?" checked":""}><span class="nm">${esc(p.name)}</span><span class="h">R1 Hole ${p.h1}</span></label>`});
+    ps.forEach(p=>{const on=!!S.ci[p.name],nt=S.notes[p.name]||"",n=esc(p.name);
+      html+=`<div class="ciitem${on?" in":""}"><div class="ciline"><label class="cirow"><input type="checkbox" data-ci="${n}" data-div="${d}"${on?" checked":""}><span class="who"><span class="nm">${n}</span><span class="nt"${nt?"":" hidden"}>${esc(nt)}</span></span><span class="h">R1 Hole ${p.h1}</span></label>`+
+        `<button type="button" class="cinb${nt?" has":""}" data-nb="${n}" aria-label="Note for ${n}">Note</button></div></div>`});
     html+=`</div>`;
   });
   $("#cilist").innerHTML=html||`<p class="muted">${CIF==="out"&&!q?"Everyone is checked in.":"No players match."}</p>`;
@@ -528,11 +537,30 @@ $("#cilist").addEventListener("change",e=>{
   if(t.checked)S.ci[t.dataset.ci]=true;else delete S.ci[t.dataset.ci];
   save();
   // Update in place (no re-render) so a player doesn't vanish mid-tap under "Not checked in".
-  t.closest(".cirow").classList.toggle("in",t.checked);
+  t.closest(".ciitem").classList.toggle("in",t.checked);
   const d=t.dataset.div,all=roster().filter(p=>p.div===d);
   const sm=document.querySelector(`[data-cid="${d}"]`);if(sm)sm.textContent=`${all.filter(p=>S.ci[p.name]).length}/${all.length} checked in`;
   renderCiProg();
 });
+// Player notes (e.g. "Paid $50 cash"): tap Note to open an editor under the row; saves as you type.
+$("#cilist").addEventListener("click",e=>{
+  const b=e.target.closest("[data-nb]");if(!b)return;
+  const item=b.closest(".ciitem"),open=item.querySelector(".cied");
+  document.querySelectorAll(".cied").forEach(x=>x.remove());
+  if(open)return;
+  const ed=document.createElement("div");ed.className="cied";
+  ed.innerHTML=`<input type="text" enterkeyhint="done" placeholder="e.g. Paid $50 cash" autocomplete="off"><button type="button" class="btn ghost">Done</button>`;
+  const inp=ed.querySelector("input");inp.value=S.notes[b.dataset.nb]||"";inp.dataset.nn=b.dataset.nb;
+  item.appendChild(ed);inp.focus();
+});
+$("#cilist").addEventListener("input",e=>{
+  const t=e.target;if(t.dataset.nn===undefined)return;
+  const v=t.value.trim(),item=t.closest(".ciitem");
+  if(v)S.notes[t.dataset.nn]=v;else delete S.notes[t.dataset.nn];save();
+  const nt=item.querySelector(".nt");nt.textContent=v;nt.hidden=!v;item.querySelector(".cinb").classList.toggle("has",!!v);
+});
+$("#cilist").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.dataset.nn!==undefined)e.target.closest(".cied").remove()});
+$("#cilist").addEventListener("click",e=>{if(e.target.matches(".cied .btn"))e.target.closest(".cied").remove()});
 $("#ciq").addEventListener("input",renderCheckin);
 document.querySelectorAll("[data-cif]").forEach(b=>b.onclick=()=>{CIF=b.dataset.cif;renderCheckin();});
 
