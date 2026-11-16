@@ -23,6 +23,7 @@ nav button{flex:1;min-width:max-content;background:transparent;border:0;color:#f
 nav button.on{opacity:1;border-bottom-color:#fff}
 main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-inset-bottom))}
 .panel{display:none}.panel.on{display:block}
+.cihead{position:sticky;top:var(--hh,0px);z-index:4;background:var(--bg);margin:-14px -12px 0;padding:10px 12px 2px;border-bottom:1px solid var(--line)}
 .bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .bar input[type=search]{flex:1;min-width:160px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:16px;background:#fff}
 .btn{appearance:none;border:1px solid var(--accent);background:var(--accent);color:#fff;border-radius:10px;padding:10px 14px;font-weight:600;font-size:14px;line-height:1;font-family:inherit;cursor:pointer}
@@ -129,11 +130,13 @@ table.card{border:1.2pt solid #000}
 </header>
 <main>
   <section id="ci" class="panel">
+    <div class="cihead">
     <div class="bar">
       <input type="search" id="ciq" placeholder="Search player or division…" autocomplete="off">
     </div>
     <div class="bar"><span class="progress" id="ciprog"></span>
       <span class="seg" role="group" aria-label="Show"><button type="button" data-cif="all" class="on">Show all</button><button type="button" data-cif="out">Hide checked in</button></span>
+    </div>
     </div>
     <div id="cilist"></div>
   </section>
@@ -533,6 +536,9 @@ $("#cilist").addEventListener("change",e=>{
 $("#ciq").addEventListener("input",renderCheckin);
 document.querySelectorAll("[data-cif]").forEach(b=>b.onclick=()=>{CIF=b.dataset.cif;renderCheckin();});
 
+// Sticky check-in controls sit just under the sticky header, whose height varies with the phone's notch.
+const setHH=()=>document.documentElement.style.setProperty("--hh",document.querySelector("header").offsetHeight+"px");
+setHH();addEventListener("resize",setHH);addEventListener("orientationchange",setHH);
 function render(t){if(t==="ci")renderCheckin();if(t==="r1")renderScores();if(t==="r2")renderR2();if(t==="st")renderSt();if(t==="setup")renderSetup()}
 render("r1");
 
