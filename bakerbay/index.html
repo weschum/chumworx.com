@@ -43,6 +43,7 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .row input:focus{outline:2px solid var(--accent);border-color:var(--accent)}
 .row input.filled{background:var(--accent2);border-color:#b9d1c1}
 .row input.odd{background:var(--warnbg);border:2px solid var(--warn);color:var(--warn)}
+.row input.ns{background:#eceeed;color:var(--muted);text-decoration:line-through}
 .pill.odd{background:var(--warnbg);color:var(--warn)}
 .seg{display:inline-flex;margin-left:auto;border:1px solid var(--accent);border-radius:8px;overflow:hidden}
 .seg button{appearance:none;border:0;background:#fff;color:var(--accent);font-family:inherit;font-weight:600;font-size:13px;padding:6px 10px;cursor:pointer}
@@ -155,6 +156,7 @@ table.card{border:1.2pt solid #000}
     <div class="bar"><span class="progress" id="prog"></span>
       <span class="seg" role="group" aria-label="Sort players by"><button type="button" data-sort="r1" class="on">R1 cards</button><button type="button" data-sort="r2">R2 cards</button></span>
     </div>
+    <p class="muted" style="font-size:13px;margin:0 0 8px">Enter <b>0</b> for a player who didn't play the round (no-show). They're left off Round 2 cards and the PDGA export.</p>
     <div id="sortNote"></div>
     <div id="r1list"></div>
   </section>
@@ -267,13 +269,16 @@ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
 // ---------- scores ----------
 // Par is 56: flag scores under 40 or over 80 for a double check (still allowed).
 const ODD_LO=40,ODD_HI=80;
-const odd=v=>v!==null&&(v<ODD_LO||v>ODD_HI);
-const inCls=v=>(v!==null?"filled":"")+(odd(v)?" odd":"");
+// A score of 0 means the player didn't play that round (no-show). pv() gives the playable score or null.
+const NS=0,isNS=v=>v===NS,pv=(m,n)=>{const v=sc(m,n);return v===NS?null:v};
+const odd=v=>v!==null&&v!==NS&&(v<ODD_LO||v>ODD_HI);
+const inCls=v=>(v!==null?"filled":"")+(odd(v)?" odd":"")+(isNS(v)?" ns":"");
 function renderProg(){
   const R=roster();
   const n1=R.filter(p=>sc(S.r1,p.name)!==null).length,n2=R.filter(p=>sc(S.r2,p.name)!==null).length;
   const nOdd=R.filter(p=>odd(sc(S.r1,p.name))).length+R.filter(p=>odd(sc(S.r2,p.name))).length;
-  $("#prog").innerHTML=`<span class="pill">R1 ${n1}/${R.length}</span> <span class="pill">R2 ${n2}/${R.length}</span>`+(nOdd?` <span class="pill odd" title="Scores under ${ODD_LO} or over ${ODD_HI}">${nOdd} to double-check</span>`:"");
+  const nNS=R.filter(p=>isNS(sc(S.r1,p.name))).length;
+  $("#prog").innerHTML=`<span class="pill">R1 ${n1}/${R.length}</span> <span class="pill">R2 ${n2}/${R.length}</span>`+(nNS?` <span class="pill">${nNS} no-show${nNS>1?"s":""}</span>`:"")+(nOdd?` <span class="pill odd" title="Scores under ${ODD_LO} or over ${ODD_HI}">${nOdd} to double-check</span>`:"");
 }
 // Scores tab can list players by their Round 1 cards or their Round 2 cards (this device only).
 let SORT="r1";
@@ -319,7 +324,7 @@ $("#r1list").addEventListener("input",e=>{
   if(v==="")delete S[t.dataset.r][t.dataset.n];else S[t.dataset.r][t.dataset.n]=Number(v);
   t.classList.toggle("filled",v!=="");save();
   // Don't flag the first digit while typing (e.g. "5" on the way to "56"); check once 2+ digits are in.
-  t.classList.toggle("odd",v.length>=2&&odd(Number(v)));
+  t.classList.toggle("odd",v.length>=2&&odd(Number(v)));t.classList.toggle("ns",v!==""&&Number(v)===NS);
   renderProg();
 });
 // When the field is left, flag whatever was entered, including a single digit.
@@ -337,13 +342,15 @@ function buildR2(){
   // Lower Round 1 score first; ties → lower PDGA number first; then Round 1 hole/position.
   const r2order=(a,b)=>key(a)-key(b)||(pdga(a)-pdga(b)||0)||a.h1-b.h1||a.pos-b.pos;
   const key=p=>{const v=sc(S.r1,p.name);return v===null?Infinity:v};
+  const noShow=R.filter(p=>isNS(sc(S.r1,p.name)));
+  if(noShow.length)warn.push(`${noShow.length} no-show${noShow.length>1?"s":""} left off Round 2: `+noShow.map(p=>esc(p.name)).join(", "));
   const missing=R.filter(p=>p.h1!==FIXED_HOLE&&sc(S.r1,p.name)===null);
   if(missing.length)warn.push(`${missing.length} player${missing.length>1?"s have":" has"} no Round 1 score yet and ${missing.length>1?"are":"is"} ranked last: `+missing.map(p=>esc(p.name)).join(", "));
   // fixed hole
-  R.filter(p=>p.h1===FIXED_HOLE).forEach(p=>holes[FIXED_HOLE].push({...p,fixed:true}));
+  R.filter(p=>p.h1===FIXED_HOLE&&!isNS(sc(S.r1,p.name))).forEach(p=>holes[FIXED_HOLE].push({...p,fixed:true}));
   const used=new Set(holes[FIXED_HOLE].map(p=>p.name));
   POOLS.forEach(pool=>{
-    const ps=R.filter(p=>p.h1!==FIXED_HOLE&&pool.divs.includes(p.div))
+    const ps=R.filter(p=>p.h1!==FIXED_HOLE&&pool.divs.includes(p.div)&&!isNS(sc(S.r1,p.name)))
       .sort(r2order);
     let i=0;
     pool.seq.forEach(([h,n],k)=>{
@@ -356,11 +363,11 @@ function buildR2(){
       i+=take;
     });
   });
-  const left=R.filter(p=>!used.has(p.name));
+  const left=R.filter(p=>!used.has(p.name)&&!isNS(sc(S.r1,p.name)));
   if(left.length)warn.push("Not covered by any hole rule (check divisions): "+left.map(p=>`${esc(p.name)} (${p.div})`).join(", "));
   for(let h=1;h<=18;h++){
     holes[h].sort(r2order);
-    if(holes[h].length!==5)warn.push(`Hole ${h} has ${holes[h].length} players (expected 5).`);
+    if(holes[h].length!==5&&!(noShow.length&&holes[h].length<5))warn.push(`Hole ${h} has ${holes[h].length} players (expected 5).`);
   }
   if(tieNames.size)warn.push("Tied Round 1 scores fall across a card cut line (marked TIE). Tied players are split by PDGA number — the lower number gets the higher card.");
   return {holes,warn,tieNames};
@@ -386,14 +393,14 @@ function renderSt(){
   const R=roster();let html="";
   const divs=[...DIV_ORDER.filter(d=>R.some(p=>p.div===d)),...[...new Set(R.map(p=>p.div))].filter(d=>!DIV_ORDER.includes(d))];
   divs.forEach(d=>{
-    const ps=R.filter(p=>p.div===d).map(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);return {...p,a,b,t:(a!==null&&b!==null)?a+b:null}});
+    const ps=R.filter(p=>p.div===d).map(p=>{const a=pv(S.r1,p.name),b=pv(S.r2,p.name);return {...p,a,b,na:isNS(sc(S.r1,p.name)),nb:isNS(sc(S.r2,p.name)),t:(a!==null&&b!==null)?a+b:null}});
     const anyT=ps.some(p=>p.t!==null);
     const f=p=>anyT?(p.t??(p.a!==null?1000+p.a:1e9)):(p.a??1e9);
     ps.sort((x,y)=>f(x)-f(y)||x.name.localeCompare(y.name));
     const pl=places(ps,f);
     html+=`<div class="grp"><h3>${d}<small>${ps.length} players</small></h3><table class="st"><tr><th>Pl</th><th>Player</th><th class="num">Rd 1</th><th class="num">Rd 2</th><th class="num">Total</th></tr>`;
     ps.forEach((p,i)=>{const has=anyT?p.t!==null:p.a!==null;
-      html+=`<tr><td>${has?pl[i]:"–"}</td><td>${esc(p.name)}</td><td class="num">${p.a??"–"}</td><td class="num">${p.b??"–"}</td><td class="num"><b>${p.t??"–"}</b></td></tr>`});
+      html+=`<tr><td>${has?pl[i]:"–"}</td><td>${esc(p.name)}</td><td class="num">${p.na?"NS":p.a??"–"}</td><td class="num">${p.nb?"NS":p.b??"–"}</td><td class="num"><b>${p.t??"–"}</b></td></tr>`});
     html+=`</table></div>`;
   });
   $("#stlist").innerHTML=html;
@@ -425,7 +432,7 @@ $("#resetGroups").onclick=()=>{if(confirm("Restore the original Round 1 groups?"
 $("#clearScores").onclick=()=>{if(confirm("Clear ALL Round 1 and Round 2 scores on this device?")){S.r1={};S.r2={};save();$("#groupsMsg").innerHTML=`<div class="alert ok">Scores cleared.</div>`}};
 $("#exportCsv").onclick=()=>{
   const rows=[["Division","Player","Round 1 Hole","Round 1","Round 2","Total","Checked in","Note"]];
-  roster().forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);rows.push([p.div,p.name,p.h1,a??"",b??"",(a!==null&&b!==null)?a+b:"",S.ci[p.name]?"yes":"",S.notes[p.name]||""])});
+  roster().forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name),pa=pv(S.r1,p.name),pb=pv(S.r2,p.name);rows.push([p.div,p.name,p.h1,isNS(a)?"NS":a??"",isNS(b)?"NS":b??"",(pa!==null&&pb!==null)?pa+pb:"",S.ci[p.name]?"yes":"",S.notes[p.name]||""])});
   const csv=rows.map(r=>r.map(v=>/[",]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="baker-bay-scores.csv";document.body.appendChild(a);a.click();a.remove();
 };
@@ -437,7 +444,9 @@ function pdgaName(n){const w=n.trim().split(/\s+/);let rest=w.slice(1);if(rest.l
 function pdgaRows(){
   const out=[],notes=[];
   roster().forEach(p=>{
-    let a=sc(S.r1,p.name),b=sc(S.r2,p.name);
+    if(isNS(sc(S.r1,p.name))){notes.push(`${p.name}: no-show (0), left off`);return}
+    let a=pv(S.r1,p.name),b=sc(S.r2,p.name);
+    if(isNS(b)){b=null}
     if(a===null){
       if(pdgaStatus(p)==="ns"){notes.push(`${p.name}: no-show, left off`);return}
       a=999;b=null;notes.push(`${p.name}: DNF Round 1 (999)`);
