@@ -60,6 +60,8 @@ main{max-width:860px;margin:0 auto;padding:14px 12px calc(40px + env(safe-area-i
 .alert.warn{background:var(--warnbg);color:var(--warn);border:1px solid #f3c99b}
 .alert.ok{background:var(--accent2);color:var(--accent);border:1px solid #b9d1c1}
 .alert ul{margin:6px 0 0 18px;padding:0}
+.pdrow{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid #f3c99b}
+.pdrow select{font-size:16px;padding:6px;border-radius:8px}
 table.st{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 table.st th,table.st td{padding:7px 10px;border-top:1px solid var(--line);text-align:left}
 table.st th{white-space:nowrap;font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.03em}
@@ -169,6 +171,14 @@ table.card{border:1.2pt solid #000}
     <h2>Round 2 hole rules</h2>
     <p class="muted">Within each pool, players are ranked by Round 1 total (lowest first) and handed out top-down in this order. Hole 18 keeps its Round 1 group and those players are left out of the pools. On every card the lowest Round 1 score throws first.</p>
     <table class="rules" id="rulesTbl"></table>
+    <h2>PDGA results</h2>
+    <p class="muted">For the TD Report upload in Tournament Manager. Copy, then paste into Upload with “First row in results contain field names” ticked, and set T.O. and Place to blank on Field Mappings. A DNF gets 999 in the round they didn't finish; a no-show is left off.</p>
+    <div id="pdgaReview"></div>
+    <div class="bar">
+      <button class="btn" id="pdgaCopy">Copy for PDGA</button>
+      <button class="btn ghost" id="pdgaDl">Download PDGA file (CSV)</button>
+    </div>
+    <div id="pdgaMsg"></div>
     <h2>Data</h2>
     <div class="bar">
       <button class="btn ghost" id="exportCsv">Export scores (CSV)</button>
@@ -225,7 +235,7 @@ const POOLS=[
 ];
 const DIV_ORDER=["MPO","MP40","MP50","MA1","MA40","MA50","FA50","MA60","MA2","FA2","MA3","MJ18","FJ18"];
 const KEY="bbdgc-r2-v1";
-let S={groups:DEFAULT_GROUPS,r1:{},r2:{},ci:{}};
+let S={groups:DEFAULT_GROUPS,r1:{},r2:{},ci:{},st:{}};
 // Bump GROUPS_VER whenever DEFAULT_GROUPS changes: phones then switch to the new groups (scores are kept by name).
 const GROUPS_VER=3; // v2: Jake Kasper (MA40) replaces Bobby Goodridge on hole 8; v3: Geremy Hewitt (MP40) replaces Tony Petrauski on hole 2
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.groups)S=Object.assign(S,s);}catch(e){}
@@ -390,7 +400,7 @@ function parseGroups(t){
   return g;
 }
 function renderSetup(){
-  $("#groupsTxt").value=groupsToText(S.groups);
+  $("#groupsTxt").value=groupsToText(S.groups);renderPdga();
   $("#rulesTbl").innerHTML=`<tr><td><b>Pool</b></td><td><b>Hand-out order (top → bottom)</b></td></tr>`+POOLS.map(p=>`<tr><td>${p.name}</td><td>${p.seq.map(([h,n])=>`Hole ${h}: ${n==="rest"?"rest":n}`).join(" → ")}</td></tr>`).join("")+`<tr><td>Hole 18 group</td><td>Stays together on Hole 18; not ranked into other cards</td></tr>`;
 }
 $("#applyGroups").onclick=()=>{
@@ -407,6 +417,50 @@ $("#exportCsv").onclick=()=>{
   roster().forEach(p=>{const a=sc(S.r1,p.name),b=sc(S.r2,p.name);rows.push([p.div,p.name,p.h1,a??"",b??"",(a!==null&&b!==null)?a+b:""])});
   const csv=rows.map(r=>r.map(v=>/[",]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="baker-bay-scores.csv";document.body.appendChild(a);a.click();a.remove();
+};
+
+// ---------- PDGA results ----------
+// Players missing Round 1 are either a no-show (left off) or a DNF (999). Default: checked in → DNF, else no-show.
+const pdgaStatus=p=>S.st[p.name]||(S.ci[p.name]?"dnf":"ns");
+function pdgaName(n){const w=n.trim().split(/\s+/);let rest=w.slice(1);if(rest.length>1&&rest[0].length===1)rest=rest.slice(1);return [w[0],rest.join(" ")]}
+function pdgaRows(){
+  const out=[],notes=[];
+  roster().forEach(p=>{
+    let a=sc(S.r1,p.name),b=sc(S.r2,p.name);
+    if(a===null){
+      if(pdgaStatus(p)==="ns"){notes.push(`${p.name}: no-show, left off`);return}
+      a=999;b=null;notes.push(`${p.name}: DNF Round 1 (999)`);
+    }else if(b===null){b=999;notes.push(`${p.name}: DNF Round 2 (999)`)}
+    const [f,l]=pdgaName(p.name);
+    out.push({div:p.div,f,l,num:PDGA[p.name]??"",a,b:b??"",t:(a<999&&b!==null&&b<999)?a+b:1e6});
+  });
+  const di=d=>{const i=DIV_ORDER.indexOf(d);return i<0?99:i};
+  out.sort((x,y)=>di(x.div)-di(y.div)||x.t-y.t);
+  const rows=[["DivCode","T.O.","Place","First Name","Last Name","PDGA","Rd1","Rd2"]].concat(out.map(r=>[r.div,"","",r.f,r.l,r.num,r.a,r.b]));
+  return {rows,notes,n:out.length,noNum:out.filter(r=>r.num==="").map(r=>`${r.f} ${r.l}`)};
+}
+function renderPdga(){
+  const miss=roster().filter(p=>sc(S.r1,p.name)===null);
+  $("#pdgaReview").innerHTML=miss.length?`<div class="alert warn">No Round 1 score for ${miss.length} player${miss.length>1?"s":""}. Mark each one:`+
+    miss.map(p=>{const s=pdgaStatus(p);return `<div class="pdrow"><span>${esc(p.name)} <span class="muted">· ${p.div}${S.ci[p.name]?" · checked in":""}</span></span>
+      <select data-pst="${esc(p.name)}"><option value="ns"${s==="ns"?" selected":""}>No-show (leave off)</option><option value="dnf"${s==="dnf"?" selected":""}>DNF (999)</option></select></div>`}).join("")+`</div>`:"";
+  $("#pdgaMsg").innerHTML="";
+}
+document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.pst!==undefined){S.st[t.dataset.pst]=t.value;save()}});
+function pdgaDone(how){
+  const {notes,n,noNum}=pdgaRows();
+  $("#pdgaMsg").innerHTML=`<div class="alert ok">${how}: ${n} players.`+(notes.length||noNum.length?`<ul>${notes.concat(noNum.map(x=>`${x}: no PDGA number`)).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:"")+`</div>`;
+}
+$("#pdgaCopy").onclick=async()=>{
+  const tsv=pdgaRows().rows.map(r=>r.join("\t")).join("\n");
+  try{await navigator.clipboard.writeText(tsv);pdgaDone("Copied")}
+  catch(e){const ta=document.createElement("textarea");ta.value=tsv;ta.style.cssText="position:fixed;top:0;opacity:0;font-size:16px";document.body.appendChild(ta);ta.select();
+    const ok=document.execCommand("copy");ta.remove();if(ok)pdgaDone("Copied");else $("#pdgaMsg").innerHTML=`<div class="alert warn">Couldn't copy here — use Download instead.</div>`}
+};
+$("#pdgaDl").onclick=()=>{
+  const csv=pdgaRows().rows.map(r=>r.map(v=>/[",]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(",")).join("\n");
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download="baker-bay-pdga.csv";document.body.appendChild(a);a.click();a.remove();
+  pdgaDone("Downloaded");
 };
 
 // ---------- print ----------
